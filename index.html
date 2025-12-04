@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LEGO Mighty Utan Leaderboard | Mighty Utan Sdn Bhd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font (LEGO-like bold blocky style) -->
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-light: #f2f2f2;
+      --bg-dark: #101010;
+      --card-light: #ffffff;
+      --card-dark: #181818;
+      --text-light: #222222;
+      --text-dark: #f5f5f5;
+      --lego-red: #d60000;
+      --lego-yellow: #ffcf00;
+      --accent-blue: #0076e6;
+      --lego-green: #0bb34c;
+      --lego-orange: #ff7b00;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 25px;
+      font-family: "Roboto", Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #ffffff, #e4e4e4 50%, #d2d2d2 100%);
+      color: var(--text-light);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    body.dark-mode {
+      background: radial-gradient(circle at top, #333333, #111111 55%, #000000 100%);
+      color: var(--text-dark);
+    }
+
+    /* LEGO floating blocks background */
+    .lego-block {
+      position: fixed;
+      width: 80px;
+      height: 40px;
+      border-radius: 12px;
+      opacity: 0.25;
+      z-index: 0;
+      animation: floatUp 22s linear infinite;
+      pointer-events: none;
+      filter: blur(0.2px);
+    }
+
+    .lego-block::before,
+    .lego-block::after {
+      content: "";
+      position: absolute;
+      top: -11px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: inherit;
+    }
+
+    .lego-block::before {
+      left: 10px;
+    }
+
+    .lego-block::after {
+      right: 10px;
+    }
+
+    /* Individual blocks – more quantity + variation */
+    .lego-block.block1 {
+      background: #ff0000;
+      left: 5%;
+      bottom: -90px;
+      animation-duration: 24s;
+      animation-delay: 0s;
+      transform: scale(1);
+    }
+
+    .lego-block.block2 {
+      background: #ffcf00;
+      left: 18%;
+      bottom: -120px;
+      animation-duration: 20s;
+      animation-delay: -4s;
+      transform: scale(0.9);
+    }
+
+    .lego-block.block3 {
+      background: #0076e6;
+      left: 32%;
+      bottom: -150px;
+      animation-duration: 26s;
+      animation-delay: -8s;
+      transform: scale(1.1);
+    }
+
+    .lego-block.block4 {
+      background: #0bb34c;
+      left: 46%;
+      bottom: -110px;
+      animation-duration: 23s;
+      animation-delay: -2s;
+      transform: scale(0.85);
+    }
+
+    .lego-block.block5 {
+      background: #ff7b00;
+      left: 60%;
+      bottom: -140px;
+      animation-duration: 27s;
+      animation-delay: -10s;
+      transform: scale(1.05);
+    }
+
+    .lego-block.block6 {
+      background: #ff0000;
+      left: 73%;
+      bottom: -100px;
+      animation-duration: 21s;
+      animation-delay: -6s;
+      transform: scale(0.8);
+    }
+
+    .lego-block.block7 {
+      background: #ffcf00;
+      left: 84%;
+      bottom: -130px;
+      animation-duration: 25s;
+      animation-delay: -12s;
+      transform: scale(1.15);
+    }
+
+    .lego-block.block8 {
+      background: #0076e6;
+      left: 12%;
+      bottom: -200px;
+      animation-duration: 30s;
+      animation-delay: -14s;
+      transform: scale(0.75);
+    }
+
+    .lego-block.block9 {
+      background: #0bb34c;
+      left: 52%;
+      bottom: -210px;
+      animation-duration: 28s;
+      animation-delay: -16s;
+      transform: scale(1.2);
+    }
+
+    .lego-block.block10 {
+      background: #ff7b00;
+      left: 90%;
+      bottom: -180px;
+      animation-duration: 32s;
+      animation-delay: -18s;
+      transform: scale(0.9);
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) translateX(0) scale(1);
+      }
+      40% {
+        transform: translateY(-40vh) translateX(20px) scale(1.05);
+      }
+      70% {
+        transform: translateY(-75vh) translateX(-10px) scale(0.95);
+      }
+      100% {
+        transform: translateY(-110vh) translateX(10px) scale(1);
+      }
+    }
+
+    .leaderboard-container {
+      position: relative;
+      z-index: 10;
+      width: 95%;
+      max-width: 980px;
+      background: var(--card-light);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.18);
+      transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    body.dark-mode .leaderboard-container {
+      background: var(--card-dark);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Header */
+    .lego-header {
+      background: var(--lego-red);
+      padding: 22px 20px 18px;
+      text-align: center;
+      color: #ffffff;
+      border-bottom: 6px solid var(--lego-yellow);
+      position: relative;
+    }
+
+    .lego-title {
+      font-family: "Bungee", system-ui, sans-serif;
+      font-size: 1.9rem;
+      letter-spacing: 1px;
+      margin: 0;
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .subtext {
+      font-size: 0.9rem;
+      margin-top: 4px;
+      opacity: 0.9;
+    }
+
+    /* Dark mode toggle */
+    .theme-toggle {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .toggle-btn {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      border-radius: 999px;
+      background: #ffffff;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #333;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    }
+
+    .toggle-btn span {
+      font-size: 0.95rem;
+    }
+
+    body.dark-mode .toggle-btn {
+      background: #2c2c2c;
+      color: #f5f5f5;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.7);
+    }
+
+    .banner {
+      width: 100%;
+      display: block;
+    }
+
+    .leaderboard-content {
+      padding: 24px 20px 26px;
+      text-align: center;
+    }
+
+    .leaderboard-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: inherit;
+      margin-bottom: 6px;
+    }
+
+    .leaderboard-subtitle {
+      font-size: 0.95rem;
+      color: #666666;
+      margin-bottom: 18px;
+    }
+
+    body.dark-mode .leaderboard-subtitle {
+      color: #bbbbbb;
+    }
+
+    .iframe-wrapper {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.12);
+    }
+
+    iframe {
+      width: 100%;
+      height: 1200px;
+      border: none;
+      display: block;
+      background: #ffffff;
+    }
+
+    body.dark-mode iframe {
+      background: #111;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.02);
+      color: inherit;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    body.dark-mode .footer {
+      background: rgba(255, 255, 255, 0.02);
+      border-top-color: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      .lego-title {
+        font-size: 1.4rem;
+      }
+
+      .theme-toggle {
+        right: 10px;
+      }
+
+      iframe {
+        height: 900px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .leaderboard-content {
+        padding: 18px 14px 20px;
+      }
+
+      iframe {
+        height: 780px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- More floating LEGO blocks -->
+  <div class="lego-block block1"></div>
+  <div class="lego-block block2"></div>
+  <div class="lego-block block3"></div>
+  <div class="lego-block block4"></div>
+  <div class="lego-block block5"></div>
+  <div class="lego-block block6"></div>
+  <div class="lego-block block7"></div>
+  <div class="lego-block block8"></div>
+  <div class="lego-block block9"></div>
+  <div class="lego-block block10"></div>
+
+  <div class="leaderboard-container">
+    <!-- Header -->
+    <header class="lego-header">
+      <h1 class="lego-title">LEGO® Mighty Utan Leaderboard</h1>
+      <div class="subtext">Powered by Mighty Utan Sdn Bhd</div>
+
+      <div class="theme-toggle">
+        <button class="toggle-btn" id="themeToggle" type="button">
+          <span id="themeIcon">🌙</span>
+          <span id="themeLabel">Dark Mode</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Banner 1 -->
+    <a href="#" target="_blank">
+      <img src="https://whbdistributors.com/brands/mightyutan/flight_oct2025/header_1.jpg"
+           alt="LEGO Mighty Utan Banner 1"
+           class="banner">
+    </a>
+
+    <!-- Banner 2 -->
+    <a href="#" target="_blank">
+      <img src="https://whbdistributors.com/brands/mightyutan/flight_oct2025/header_2.jpg"
+           alt="LEGO Mighty Utan Banner 2"
+           class="banner">
+    </a>
+
+    <main class="leaderboard-content">
+      <div class="leaderboard-title">🏆 Daily Updated Store Performance 🏆</div>
+      <div class="leaderboard-subtitle">
+        Refresh this page to view the latest ranking, sales & performance data for LEGO® Mighty Utan campaign.
+      </div>
+
+      <div class="iframe-wrapper">
+        <!-- Google Sheets Leaderboard -->
+        <iframe
+          id="leaderboardFrame"
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6M-gXGxpntHWiNunFBK80oRIvxiRq6O706esnYmrM0cgRZmFIwq8M2dYGGoxH5qh2NGwkzFm4y-gE/pubhtml?gid=1402449597&single=true&widget=true&headers=false">
+        </iframe>
+      </div>
+    </main>
+
+    <footer class="footer">
+      © 2025 Mighty Utan Sdn Bhd. LEGO® is a trademark of the LEGO Group. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // Dark mode toggle
+    const body = document.body;
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeLabel = document.getElementById("themeLabel");
+
+    const savedTheme = localStorage.getItem("lego-theme");
+    if (savedTheme === "dark") {
+      body.classList.add("dark-mode");
+      themeIcon.textContent = "☀️";
+      themeLabel.textContent = "Light Mode";
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const isDark = body.classList.toggle("dark-mode");
+      if (isDark) {
+        themeIcon.textContent = "☀️";
+        themeLabel.textContent = "Light Mode";
+        localStorage.setItem("lego-theme", "dark");
+      } else {
+        themeIcon.textContent = "🌙";
+        themeLabel.textContent = "Dark Mode";
+        localStorage.setItem("lego-theme", "light");
+      }
+    });
+  </script>
+</body>
+</html>
